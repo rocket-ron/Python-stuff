@@ -1,24 +1,21 @@
-def primes(n): 
-	if n==2: return [2]
-	elif n<2: return []
-	s=range(3,n+1,2)
-	mroot = n ** 0.5
-	half=(n+1)/2-1
-	i=0
-	m=3
-	while m <= mroot:
-		if s[i]:
-			j=(m*m-3)/2
-			s[j]=0
-			while j<half:
-				s[j]=0
-				j+=m
-		i=i+1
-		m=2*i+3
-	return [2]+[x for x in s if x]
+def primes1(n):
+# This method is taken from a StackOverflow question about calculation of primes performance.
+# Once I saw how the sieve of Eratosthenes worked in O(n) time I was hoping to find something
+# a litte more performant, so I put this method in here as a comparison. This method is not part
+# my own work and comes from http://stackoverflow.com/questions/2068372/fastest-way-to-list-all-primes-below-n/3035188#3035188
+# It turns out that this implementation is not Python3 compatible and runs a good 2-3 times faster than my sieve function
+
+    """ Returns  a list of primes < n """
+    sieve = [True] * (n/2)
+    for i in xrange(3,int(n**0.5)+1,2):
+        if sieve[i/2]:
+            sieve[i*i/2::i] = [False] * ((n-i*i-1)/(2*i)+1)
+    return [2] + [2*i+1 for i in xrange(1,n/2) if sieve[i]]
 
 def sieveOfEratosthenes(n):
 # sieve of eratosthenes
+#
+# I created this algorithm from the description in Wikipeadia http://en.wikipedia.org/wiki/Sieve_of_Eratosthenes
 #
 # given a number N find all primes less than N
 # We can do this by setting up a list of numbers up to N, then starting with the number 2, eliminate the multiples of that value.
@@ -87,16 +84,25 @@ def factor(n, primes):
 number = 1234567890
 
 print("Calculating the sieve of Eratosthenes")
-primes = sieveOfEratosthenes(number)
-#primes = primes(number)
+#primes = sieveOfEratosthenes(number)
+primes = primes1(number)
 
 print("factoring...")
 # This is the factor tree of our number
 fTree = factor(number, primes)
+print (fTree)
 
 print("Harvesting...")
 # Now traverse the tree to harvest the factors
 factors = getFactors(fTree)
 
-print (fTree)
 print (factors)
+
+uniqueFactors = set()
+# Count the number of unique prime factors
+for factor in factors:
+	uniqueFactors.add(factor)
+
+
+print ("Unique factors {}".format(len(uniqueFactors)))
+
